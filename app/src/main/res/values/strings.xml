@@ -2,6 +2,10 @@
     <string name="app_name">Music Discovery</string>
 
     <string name="index_page_title">Music Discovery App</string>
+    <string name="index_page_route">Start</string>
+
+    <string name="artists_page_title">Artists</string>
+    <string name="artists_page_route">Artists?artistName={artistName}</string>
 
     <string name="back_button">Back</string>
 </resources>
