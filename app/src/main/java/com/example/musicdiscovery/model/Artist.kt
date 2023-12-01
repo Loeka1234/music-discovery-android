@@ -16,5 +16,8 @@ data class Artist(
     @SerialName(value = "picture_big")
     val pictureBig: String,
     @SerialName(value = "picture_xl")
-    val pictureXl: String
+    val pictureXl: String,
+
+    @SerialName(value = "nb_fan")
+    val nbFan: Int
 )
