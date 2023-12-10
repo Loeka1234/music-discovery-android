@@ -7,5 +7,8 @@
     <string name="artists_page_title">Artists</string>
     <string name="artists_page_route">Artists?artistName={artistName}</string>
 
+    <string name="artist_details_title">Artist</string>
+    <string name="artist_details_route">Artist?artistId={artistId}</string>
+
     <string name="back_button">Back</string>
 </resources>

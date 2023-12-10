@@ -1,4 +1,4 @@
-package com.example.musicdiscovery.ui.screens
+package com.example.musicdiscovery.ui.screens.artist
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,40 +10,40 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.musicdiscovery.MusicDiscoveryApplication
 import com.example.musicdiscovery.data.DeezerArtistRepository
-import com.example.musicdiscovery.model.Artist
+import com.example.musicdiscovery.model.Track
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-sealed interface ArtistsUiState {
-    data class Success(val artists: List<Artist>) : ArtistsUiState
-    object Error : ArtistsUiState
-    object Loading : ArtistsUiState
+sealed interface ArtistDetailsUiState {
+    data class Success(val tracks: List<Track>) : ArtistDetailsUiState
+    object Error : ArtistDetailsUiState
+    object Loading : ArtistDetailsUiState
 }
 
-class ArtistsViewModel(private val deezerArtistRepository : DeezerArtistRepository) : ViewModel() {
-    var artistsUiState: ArtistsUiState by mutableStateOf(ArtistsUiState.Loading)
+class ArtistDetailsViewModel(private val deezerArtistRepository : DeezerArtistRepository) : ViewModel() {
+    var artistDetailsUiState: ArtistDetailsUiState by mutableStateOf(ArtistDetailsUiState.Loading)
         private set
-    var initialExecuted = false;
+    var initialExecuted = false
 
-    fun initialGetArtists(artistName: String) {
-        if (!initialExecuted)
-            getArtists(artistName)
+    fun initialGetTracks(artistId: Int) {
+        if (initialExecuted) return
+        getTracks(artistId)
         initialExecuted = true
     }
 
-    fun getArtists(artistName: String) {
+    fun getTracks(artistId: Int) {
         viewModelScope.launch {
-            artistsUiState = ArtistsUiState.Loading
-            artistsUiState = try {
-                val artists = deezerArtistRepository.searchArtist(artistName)
-                ArtistsUiState.Success(artists.data)
+            artistDetailsUiState = ArtistDetailsUiState.Loading
+            artistDetailsUiState = try {
+                val tracks = deezerArtistRepository.getArtistTracks(artistId)
+                ArtistDetailsUiState.Success(tracks.data)
             } catch (e: IOException) {
                 e.printStackTrace()
-                ArtistsUiState.Error
+                ArtistDetailsUiState.Error
             } catch (e: HttpException) {
                 e.printStackTrace()
-                ArtistsUiState.Error
+                ArtistDetailsUiState.Error
             }
         }
     }
@@ -53,7 +53,7 @@ class ArtistsViewModel(private val deezerArtistRepository : DeezerArtistReposito
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MusicDiscoveryApplication)
                 val deezerArtistRepository = application.container.deezerArtistRepository
-                ArtistsViewModel(deezerArtistRepository = deezerArtistRepository)
+                ArtistDetailsViewModel(deezerArtistRepository = deezerArtistRepository)
             }
         }
     }

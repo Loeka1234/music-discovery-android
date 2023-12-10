@@ -1,11 +1,18 @@
 package com.example.musicdiscovery.network
 
 import com.example.musicdiscovery.model.Artist
-import com.example.musicdiscovery.model.DeezerArtistSearchData
+import com.example.musicdiscovery.model.DeezerResponseList
+import com.example.musicdiscovery.model.Track
+import com.example.musicdiscovery.model.TrackDetails
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface DeezerApiService {
     @GET("search/artist")
-    suspend fun getArtists(@Query("q") artistName: String): DeezerArtistSearchData
+    suspend fun getArtists(@Query("q") artistName: String): DeezerResponseList<Artist>
+    @GET("artist/{artistId}/top")
+    suspend fun getArtistTracks(@Path("artistId") artistId: Int, @Query("limit") limit: Int, @Query("index") index: Int): DeezerResponseList<Track>
+    @GET("track/{trackId}")
+    suspend fun getTrackDetails(@Path("trackId") trackId: Long): TrackDetails
 }

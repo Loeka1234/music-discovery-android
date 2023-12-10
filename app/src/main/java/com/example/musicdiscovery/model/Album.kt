@@ -3,6 +3,7 @@ package com.example.musicdiscovery.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DeezerArtistSearchData (
-    val data: List<Artist>
+data class Album (
+    val id: Long,
+    val cover: String
 )

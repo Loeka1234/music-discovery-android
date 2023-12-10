@@ -24,15 +24,17 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
-import com.example.musicdiscovery.ui.screens.ArtistsScreen
+import com.example.musicdiscovery.ui.screens.artists.ArtistsScreen
 import com.example.musicdiscovery.ui.screens.StartScreen
+import com.example.musicdiscovery.ui.screens.artist.ArtistDetailsScreen
 
 /**
  * enum values that represent the screens in the app
  */
 enum class MusicDiscoveryScreen(@StringRes val title: Int, @StringRes val route: Int) {
     Start(title = R.string.index_page_title, route = R.string.index_page_route),
-    ArtistsPage(title = R.string.artists_page_title, route = R.string.artists_page_route)
+    ArtistsPage(title = R.string.artists_page_title, route = R.string.artists_page_route),
+    ArtistDetailsPage(title = R.string.artist_details_title, route = R.string.artist_details_route)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +87,7 @@ fun MusicDiscoveryApp(
     ) { innerPadding ->
         val homeRoute = stringResource(id = MusicDiscoveryScreen.Start.route)
         val artistsPageRoute = stringResource(id = MusicDiscoveryScreen.ArtistsPage.route)
+        val artistDetailsRoute = stringResource(id = MusicDiscoveryScreen.ArtistDetailsPage.route)
 
         NavHost (
             navController = navController,
@@ -94,8 +97,8 @@ fun MusicDiscoveryApp(
             composable(
                 route = artistsPageRoute,
                 arguments = listOf(navArgument("artistName") { type = NavType.StringType }),
-            ) { backStackEntry ->
-                val artistName = backStackEntry.arguments?.getString("artistName")
+            ) {
+                val artistName = it.arguments?.getString("artistName")
 
                 if (artistName == null)
                     navController.navigate(homeRoute)
@@ -103,7 +106,25 @@ fun MusicDiscoveryApp(
                     ArtistsScreen(
                         modifier = Modifier
                             .fillMaxSize(),
-                        artistName = artistName
+                        artistName,
+                        onArtistClick = { artistId -> navController.navigate("Artist?artistId=${artistId}")}
+                    )
+                }
+            }
+
+            composable(
+                route = artistDetailsRoute,
+                arguments = listOf(navArgument("artistId") { type = NavType.IntType }),
+            ) {
+                val artistId = it.arguments?.getInt("artistId")
+
+                if (artistId == null)
+                    navController.navigate(homeRoute)
+                else {
+                    ArtistDetailsScreen(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        artistId
                     )
                 }
             }
