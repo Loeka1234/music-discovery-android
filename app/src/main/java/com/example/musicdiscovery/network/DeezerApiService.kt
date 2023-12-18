@@ -15,4 +15,6 @@ interface DeezerApiService {
     suspend fun getArtistTracks(@Path("artistId") artistId: Int, @Query("limit") limit: Int, @Query("index") index: Int): DeezerResponseList<Track>
     @GET("track/{trackId}")
     suspend fun getTrackDetails(@Path("trackId") trackId: Long): TrackDetails
+    @GET("artist/{artistId}")
+    suspend fun getArtistDetails(@Path("artistId") artistId: Int): Artist
 }

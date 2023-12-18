@@ -8,6 +8,7 @@ import com.example.musicdiscovery.network.DeezerApiService
 interface DeezerArtistRepository {
     suspend fun searchArtist(name: String): DeezerResponseList<Artist>
     suspend fun getArtistTracks(artistId: Int): DeezerResponseList<Track>
+    suspend fun getArtistDetails(artistId: Int): Artist
 }
 
 class NetworkDeezerArtistRepository(
@@ -23,4 +24,5 @@ class NetworkDeezerArtistRepository(
 
         return tracks;
     }
+    override suspend fun getArtistDetails(artistId: Int): Artist = deezerApiService.getArtistDetails(artistId)
 }

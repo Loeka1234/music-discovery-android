@@ -10,13 +10,16 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.musicdiscovery.MusicDiscoveryApplication
 import com.example.musicdiscovery.data.DeezerArtistRepository
+import com.example.musicdiscovery.model.Artist
 import com.example.musicdiscovery.model.Track
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
+data class ArtistDetailsData (val artist: Artist, val tracks: List<Track>)
+
 sealed interface ArtistDetailsUiState {
-    data class Success(val tracks: List<Track>) : ArtistDetailsUiState
+    data class Success(val artistDetails: ArtistDetailsData) : ArtistDetailsUiState
     object Error : ArtistDetailsUiState
     object Loading : ArtistDetailsUiState
 }
@@ -26,18 +29,19 @@ class ArtistDetailsViewModel(private val deezerArtistRepository : DeezerArtistRe
         private set
     var initialExecuted = false
 
-    fun initialGetTracks(artistId: Int) {
+    fun initialGetArtistDetails(artistId: Int) {
         if (initialExecuted) return
-        getTracks(artistId)
+        getArtistDetails(artistId)
         initialExecuted = true
     }
 
-    fun getTracks(artistId: Int) {
+    fun getArtistDetails(artistId: Int) {
         viewModelScope.launch {
             artistDetailsUiState = ArtistDetailsUiState.Loading
             artistDetailsUiState = try {
+                val artist = deezerArtistRepository.getArtistDetails(artistId)
                 val tracks = deezerArtistRepository.getArtistTracks(artistId)
-                ArtistDetailsUiState.Success(tracks.data)
+                ArtistDetailsUiState.Success(ArtistDetailsData(artist, tracks.data))
             } catch (e: IOException) {
                 e.printStackTrace()
                 ArtistDetailsUiState.Error
