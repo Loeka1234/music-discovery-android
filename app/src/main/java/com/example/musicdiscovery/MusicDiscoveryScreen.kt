@@ -18,12 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
+import androidx.navigation.navOptions
 import com.example.musicdiscovery.ui.screens.artists.ArtistsScreen
 import com.example.musicdiscovery.ui.screens.StartScreen
 import com.example.musicdiscovery.ui.screens.artist.ArtistDetailsScreen
@@ -107,7 +109,7 @@ fun MusicDiscoveryApp(
                         modifier = Modifier
                             .fillMaxSize(),
                         artistName,
-                        onArtistClick = { artistId -> navController.navigate("Artist?artistId=${artistId}")}
+                        onArtistClick = { artistId -> navController.navigate("Artist?artistId=${artistId}") }
                     )
                 }
             }
@@ -133,7 +135,8 @@ fun MusicDiscoveryApp(
                 StartScreen(
                     modifier = Modifier
                         .fillMaxSize(),
-                    onNavigateToArtists = { artistName -> navController.navigate("Artists?artistName=${artistName}") }
+                    onNavigateToArtists = { artistName -> navController.navigate("Artists?artistName=${artistName}") },
+                    onArtistClick = { artistId -> navController.navigate("Artist?artistId=${artistId}")}
                 )
             }
         }

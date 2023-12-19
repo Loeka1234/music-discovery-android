@@ -8,13 +8,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.musicdiscovery.model.Artist
+import com.example.musicdiscovery.ui.screens.shared.ArtistCard
 import com.example.musicdiscovery.ui.screens.shared.CustomCard
 import com.example.musicdiscovery.ui.screens.shared.ErrorScreen
+import com.example.musicdiscovery.ui.screens.shared.FavoriteButton
 import com.example.musicdiscovery.ui.screens.shared.LoadingScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun ArtistsScreen(
@@ -22,6 +26,8 @@ fun ArtistsScreen(
     artistName: String,
     onArtistClick: (artistId: Long) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     val artistsViewModel: ArtistsViewModel =
         viewModel(factory = ArtistsViewModel.Factory)
 
@@ -31,7 +37,8 @@ fun ArtistsScreen(
         artistsUiState = artistsViewModel.artistsUiState,
         retryAction = { artistsViewModel.getArtists(artistName) },
         modifier,
-        onArtistClick = onArtistClick
+        onArtistClick = onArtistClick,
+        favoriteArtist = { artistsViewModel.favoriteOrUnfavoriteArtist(it) }
     )
 }
 
@@ -40,52 +47,34 @@ fun ArtistsScreenSwitch(
     artistsUiState: ArtistsUiState,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
-    onArtistClick: (artistId: Long) -> Unit
+    onArtistClick: (artistId: Long) -> Unit,
+    favoriteArtist: (artist: Artist) -> Unit
 ) {
     when (artistsUiState) {
         is ArtistsUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is ArtistsUiState.Success -> ViewArtistsScreen(artistsUiState.artists, modifier = modifier.fillMaxSize(), onArtistClick)
+        is ArtistsUiState.Success -> ViewArtistsScreen(artistsUiState.artistsUiData, modifier = modifier.fillMaxSize(), favoriteArtist = favoriteArtist, onArtistClick = onArtistClick)
         is ArtistsUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize(), errorMessage = "Oops something went wrong while getting artist...")
     }
 }
 
 @Composable
 fun ViewArtistsScreen(
-    artists: List<Artist>,
+    artistsUiData: ArtistsUiData,
     modifier: Modifier = Modifier,
-    onArtistClick: (artistId: Long) -> Unit
+    onArtistClick: (artistId: Long) -> Unit,
+    favoriteArtist: (artist: Artist) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
-        items(artists) { artist ->
+        items(artistsUiData.artists) { artist ->
             ArtistCard(
-                artist = artist,
+                artistId = artist.id,
+                artistPicture = artist.picture,
+                artistName = artist.name,
+                artistFans = artist.nbFan,
+                isFavorite = artistsUiData.favoriteArtists.any { it.id == artist.id },
+                favoriteArtist = { favoriteArtist(artist)  },
+                onArtistClick = onArtistClick,
                 modifier = Modifier.padding(8.dp),
-                onArtistClick
-            )
-        }
-    }
-}
-
-@Composable
-fun ArtistCard(
-    artist: Artist,
-    modifier: Modifier = Modifier,
-    onArtistClick: (artistId: Long) -> Unit
-) {
-    CustomCard(
-        picture = artist.picture,
-        contentDescription = artist.name,
-        modifier = modifier,
-        onClick = { onArtistClick(artist.id) }
-    ) {
-        Column(modifier = modifier.padding(vertical = 8.dp)) {
-            Text(
-                text = artist.name,
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Text(
-                text = "Fans: ${artist.nbFan}",
-                style = MaterialTheme.typography.labelLarge
             )
         }
     }

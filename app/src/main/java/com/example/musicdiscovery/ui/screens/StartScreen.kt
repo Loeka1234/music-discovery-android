@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,18 +15,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.musicdiscovery.ui.screens.shared.FavoriteArtistsList.FavoriteArtistsList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartScreen(
     modifier: Modifier = Modifier,
-    onNavigateToArtists: (artistName: String) -> Unit
+    onNavigateToArtists: (artistName: String) -> Unit,
+    onArtistClick: (artistId: Long) -> Unit
 ) {
-    val navController = rememberNavController()
     var artistName by remember { mutableStateOf("") }
 
     Column (modifier = modifier) {
-        Text(text = "Search artist")
+        Text(
+            text = "Search artist",
+            style = MaterialTheme.typography.headlineMedium
+        )
         OutlinedTextField(
             value = artistName,
             onValueChange = { artistName = it },
@@ -37,6 +42,12 @@ fun StartScreen(
         }) {
             Text(text = "Search")
         }
+
+        Text(
+            text = "Favorite artists:",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        FavoriteArtistsList(modifier = modifier, onArtistClick = onArtistClick)
     }
 }
 
