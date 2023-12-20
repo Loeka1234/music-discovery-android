@@ -3,6 +3,7 @@ package com.example.musicdiscovery.ui.screens.artist
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.example.musicdiscovery.MusicDiscoveryApplication
 import com.example.musicdiscovery.data.DeezerArtistRepository
 import com.example.musicdiscovery.model.Artist
 import com.example.musicdiscovery.model.Track
+import com.example.musicdiscovery.ui.screens.artists.ArtistsDestination
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -24,18 +26,19 @@ sealed interface ArtistDetailsUiState {
     object Loading : ArtistDetailsUiState
 }
 
-class ArtistDetailsViewModel(private val deezerArtistRepository : DeezerArtistRepository) : ViewModel() {
+class ArtistDetailsViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val deezerArtistRepository : DeezerArtistRepository
+) : ViewModel() {
     var artistDetailsUiState: ArtistDetailsUiState by mutableStateOf(ArtistDetailsUiState.Loading)
         private set
-    var initialExecuted = false
+    private val artistId: Long = checkNotNull(savedStateHandle[ArtistDetailsDestination.artistIdArg])
 
-    fun initialGetArtistDetails(artistId: Int) {
-        if (initialExecuted) return
+    init {
         getArtistDetails(artistId)
-        initialExecuted = true
     }
 
-    fun getArtistDetails(artistId: Int) {
+    fun getArtistDetails(artistId: Long) {
         viewModelScope.launch {
             artistDetailsUiState = ArtistDetailsUiState.Loading
             artistDetailsUiState = try {
@@ -48,16 +51,6 @@ class ArtistDetailsViewModel(private val deezerArtistRepository : DeezerArtistRe
             } catch (e: HttpException) {
                 e.printStackTrace()
                 ArtistDetailsUiState.Error
-            }
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MusicDiscoveryApplication)
-                val deezerArtistRepository = application.container.deezerArtistRepository
-                ArtistDetailsViewModel(deezerArtistRepository = deezerArtistRepository)
             }
         }
     }

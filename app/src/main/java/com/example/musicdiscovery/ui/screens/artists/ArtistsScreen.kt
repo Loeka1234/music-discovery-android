@@ -1,43 +1,79 @@
 package com.example.musicdiscovery.ui.screens.artists
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.musicdiscovery.MusicDiscoveryAppBar
+import com.example.musicdiscovery.R
 import com.example.musicdiscovery.model.Artist
+import com.example.musicdiscovery.navigation.NavigationDestination
+import com.example.musicdiscovery.ui.AppViewModelProvider
 import com.example.musicdiscovery.ui.screens.shared.ArtistCard
-import com.example.musicdiscovery.ui.screens.shared.CustomCard
 import com.example.musicdiscovery.ui.screens.shared.ErrorScreen
-import com.example.musicdiscovery.ui.screens.shared.FavoriteButton
 import com.example.musicdiscovery.ui.screens.shared.LoadingScreen
-import kotlinx.coroutines.launch
 
+object ArtistsDestination : NavigationDestination {
+    override val route = "Artists"
+    override val titleRes = R.string.artists_page_title
+    const val artistNameArg = "artistName"
+    val routeWithArgs = "$route/{$artistNameArg}"
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistsScreen(
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     artistName: String,
-    onArtistClick: (artistId: Long) -> Unit
+    navigateToArtistDetails: (artistId: Long) -> Unit,
+    artistsViewModel: ArtistsViewModel =
+        viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    val artistsViewModel: ArtistsViewModel =
-        viewModel(factory = ArtistsViewModel.Factory)
+    Scaffold(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MusicDiscoveryAppBar(
+                title = stringResource(ArtistsDestination.titleRes),
+                navigateBack = navigateBack,
+                scrollBehavior = scrollBehavior
+            )
+        },
+    ) { innerPadding ->
+        ArtistsScreenBody(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            artistName = artistName,
+            navigateToArtistDetails = navigateToArtistDetails,
+            artistsViewModel = artistsViewModel
+        )
+    }
+}
 
-    artistsViewModel.initialGetArtists(artistName)
-
+@Composable
+fun ArtistsScreenBody(
+    modifier: Modifier = Modifier,
+    artistsViewModel: ArtistsViewModel,
+    artistName: String,
+    navigateToArtistDetails: (artistId: Long) -> Unit,
+) {
     ArtistsScreenSwitch(
         artistsUiState = artistsViewModel.artistsUiState,
         retryAction = { artistsViewModel.getArtists(artistName) },
         modifier,
-        onArtistClick = onArtistClick,
+        onArtistClick = navigateToArtistDetails,
         favoriteArtist = { artistsViewModel.favoriteOrUnfavoriteArtist(it) }
     )
 }

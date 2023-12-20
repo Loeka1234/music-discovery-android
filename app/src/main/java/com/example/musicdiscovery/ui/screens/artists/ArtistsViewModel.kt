@@ -3,6 +3,7 @@ package com.example.musicdiscovery.ui.screens.artists
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -31,17 +32,16 @@ sealed interface ArtistsUiState {
 }
 
 class ArtistsViewModel(
+    savedStateHandle: SavedStateHandle,
     private val deezerArtistRepository : DeezerArtistRepository,
     private val favoriteArtistsRepository: FavoriteArtistsRepository
 ) : ViewModel() {
     var artistsUiState: ArtistsUiState by mutableStateOf(ArtistsUiState.Loading)
         private set
-    var initialExecuted = false;
 
-    fun initialGetArtists(artistName: String) {
-        if (!initialExecuted)
-            getArtists(artistName)
-        initialExecuted = true
+    private val artistName: String = checkNotNull(savedStateHandle[ArtistsDestination.artistNameArg])
+    init {
+        getArtists(artistName)
     }
 
     fun getArtists(artistName: String) {
@@ -84,17 +84,6 @@ class ArtistsViewModel(
                     cloned
                 )
             )
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MusicDiscoveryApplication)
-                val deezerArtistRepository = application.container.deezerArtistRepository
-                val favoriteArtistsRepository = application.container.favoriteArtistsRepository
-                ArtistsViewModel(deezerArtistRepository = deezerArtistRepository, favoriteArtistsRepository = favoriteArtistsRepository)
-            }
         }
     }
 }

@@ -16,29 +16,73 @@ import com.example.musicdiscovery.ui.screens.shared.CustomCard
 import com.example.musicdiscovery.ui.screens.shared.ErrorScreen
 import com.example.musicdiscovery.ui.screens.shared.LoadingScreen
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.musicdiscovery.MusicDiscoveryAppBar
+import com.example.musicdiscovery.R
 import com.example.musicdiscovery.model.Artist
+import com.example.musicdiscovery.navigation.NavigationDestination
+import com.example.musicdiscovery.ui.AppViewModelProvider
+import com.example.musicdiscovery.ui.screens.artists.ArtistsDestination
+import com.example.musicdiscovery.ui.screens.artists.ArtistsScreenBody
+import com.example.musicdiscovery.ui.screens.artists.ArtistsViewModel
 
+object ArtistDetailsDestination : NavigationDestination {
+    override val route = "Artist"
+    override val titleRes = R.string.artist_details_title
+    const val artistIdArg = "artistId"
+    val routeWithArgs = "$route/{$artistIdArg}"
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistDetailsScreen(
+    navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    artistId: Int
+    artistId: Long,
+    artistDetailsViewModel: ArtistDetailsViewModel =
+        viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val artistDetailsViewModel: ArtistDetailsViewModel =
-        viewModel(factory = ArtistDetailsViewModel.Factory)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    artistDetailsViewModel.initialGetArtistDetails(artistId)
-
+    Scaffold(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MusicDiscoveryAppBar(
+                title = stringResource(ArtistDetailsDestination.titleRes),
+                scrollBehavior = scrollBehavior,
+                navigateBack = navigateUp
+            )
+        },
+    ) {innerPadding ->
+        ArtistDetailsScreenBody(
+            modifier = modifier.padding(innerPadding),
+            artistDetailsViewModel = artistDetailsViewModel,
+            artistId = artistId
+        )
+    }
+}
+@Composable
+fun ArtistDetailsScreenBody(
+    artistDetailsViewModel: ArtistDetailsViewModel,
+    modifier: Modifier = Modifier,
+    artistId: Long
+) {
     ArtistDetailsScreenSwitch(
         artistDetailsUiState = artistDetailsViewModel.artistDetailsUiState,
         retryAction = { artistDetailsViewModel.getArtistDetails(artistId) },
         modifier
     )
 }
+
 
 @Composable
 fun ArtistDetailsScreenSwitch(
