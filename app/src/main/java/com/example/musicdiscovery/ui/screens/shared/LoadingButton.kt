@@ -27,7 +27,7 @@ fun LoadingButton(
         ) {
             if (loading) CircularProgressIndicator(
                 modifier = Modifier.size(ButtonDefaults.IconSize),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 strokeWidth = 2.dp
             )
             Text(text = if (loading) loadingText else text)
