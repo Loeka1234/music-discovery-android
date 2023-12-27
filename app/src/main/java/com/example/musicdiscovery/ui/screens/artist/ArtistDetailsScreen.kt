@@ -2,6 +2,7 @@ package com.example.musicdiscovery.ui.screens.artist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,8 +50,7 @@ fun ArtistDetailsScreen(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     artistId: Long,
-    artistDetailsViewModel: ArtistDetailsViewModel =
-        viewModel(factory = AppViewModelProvider.Factory)
+    artistDetailsViewModel: ArtistDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -74,9 +74,7 @@ fun ArtistDetailsScreen(
 
 @Composable
 fun ArtistDetailsScreenBody(
-    artistDetailsViewModel: ArtistDetailsViewModel,
-    modifier: Modifier = Modifier,
-    artistId: Long
+    artistDetailsViewModel: ArtistDetailsViewModel, modifier: Modifier = Modifier, artistId: Long
 ) {
     ArtistDetailsScreenSwitch(
         artistDetailsUiState = artistDetailsViewModel.artistDetailsUiState,
@@ -143,8 +141,7 @@ fun ArtistDetails(artist: Artist, modifier: Modifier = Modifier) {
                 .padding(top = 16.dp, bottom = 4.dp)
         )
         Text(
-            text = artist.name,
-            style = MaterialTheme.typography.headlineLarge
+            text = artist.name, style = MaterialTheme.typography.headlineLarge
         )
     }
 }
@@ -165,19 +162,22 @@ fun Tracks(
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(
-                    text = track.title,
-                    style = MaterialTheme.typography.headlineSmall
+                    text = track.title, style = MaterialTheme.typography.headlineSmall
                 )
             }
         }
         item {
-            if (hasMore)
+            if (hasMore) Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 LoadingButton(
                     text = "Fetch more...",
                     loadingText = "Fetching more...",
                     onClick = fetchMoreTracks,
                     loading = isFetchingMore
                 )
+            }
         }
     }
 }

@@ -1,6 +1,10 @@
 package com.example.musicdiscovery.ui.screens.artists
 
+import android.inputmethodservice.Keyboard.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -134,12 +138,17 @@ fun ViewArtistsScreen(
         }
         item {
             if (hasMore)
-                LoadingButton(
-                    text = "Fetch more...",
-                    loadingText = "Fetching more...",
-                    onClick = fetchMoreArtists,
-                    loading = isFetchingMore
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    LoadingButton(
+                        text = "Fetch more...",
+                        loadingText = "Fetching more...",
+                        onClick = fetchMoreArtists,
+                        loading = isFetchingMore
+                    )
+                }
         }
     }
 }

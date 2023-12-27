@@ -18,16 +18,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoadingButton(
-    text: String,
-    loadingText: String,
-    onClick: () -> Unit,
-    loading: Boolean
+    text: String, loadingText: String, onClick: () -> Unit, loading: Boolean
 ) {
-    Button(onClick = onClick) {
+    Button(onClick = { if (!loading) onClick() }) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
-        )        {
+        ) {
             if (loading) CircularProgressIndicator(
                 modifier = Modifier.size(ButtonDefaults.IconSize),
                 color = Color.White,
@@ -42,10 +39,7 @@ fun LoadingButton(
 @Composable
 fun LoadingButtonPreview() {
     LoadingButton(
-        text = "Fetch more...",
-        loadingText = "Fetching more...",
-        onClick = {},
-        loading = false
+        text = "Fetch more...", loadingText = "Fetching more...", onClick = {}, loading = false
     )
 }
 
@@ -53,9 +47,6 @@ fun LoadingButtonPreview() {
 @Composable
 fun LoadingButtonPreviewLoading() {
     LoadingButton(
-        text = "Fetch more...",
-        loadingText = "Fetching more...",
-        onClick = {},
-        loading = true
+        text = "Fetch more...", loadingText = "Fetching more...", onClick = {}, loading = true
     )
 }
