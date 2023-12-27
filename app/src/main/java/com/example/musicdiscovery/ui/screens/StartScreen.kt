@@ -1,6 +1,8 @@
 package com.example.musicdiscovery.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,10 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.example.musicdiscovery.MusicDiscoveryAppBar
 import com.example.musicdiscovery.R
 import com.example.musicdiscovery.navigation.NavigationDestination
-import com.example.musicdiscovery.ui.screens.shared.favoriteArtistsList.FavoriteArtistsList
+import com.example.musicdiscovery.ui.screens.shared.FavoriteArtistsList.FavoriteArtistsList
 
 object StartScreenDestination : NavigationDestination {
     override val route = "Start"
@@ -57,16 +60,28 @@ fun StartScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartScreenBody(
     modifier: Modifier = Modifier,
     onNavigateToArtists: (artistName: String) -> Unit,
     onArtistClick: (artistId: Long) -> Unit
 ) {
-    var artistName by remember { mutableStateOf("") }
 
     Column (modifier = modifier) {
+        SearchArtistBox(onNavigateToArtists = onNavigateToArtists)
+        FavoriteArtistsListWrapper(onArtistClick = onArtistClick)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchArtistBox(
+    onNavigateToArtists: (artistName: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.padding(4.dp)) {
+        var artistName by remember { mutableStateOf("") }
+
         Text(
             text = "Search artist",
             style = MaterialTheme.typography.headlineMedium
@@ -77,12 +92,22 @@ fun StartScreenBody(
             label = { Text("Artist") },
             modifier = Modifier.fillMaxWidth()
         )
-        Button( onClick = {
-            onNavigateToArtists(artistName)
-        }) {
-            Text(text = "Search")
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button( onClick = {
+                onNavigateToArtists(artistName)
+            }) {
+                Text(text = "Search")
+            }
         }
+    }
+}
 
+@Composable
+fun FavoriteArtistsListWrapper(
+    onArtistClick: (artistId: Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.padding(4.dp)) {
         Text(
             text = "Favorite artists:",
             style = MaterialTheme.typography.headlineMedium
