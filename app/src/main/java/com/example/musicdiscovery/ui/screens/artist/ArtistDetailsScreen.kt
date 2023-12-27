@@ -34,6 +34,7 @@ import com.example.musicdiscovery.ui.AppViewModelProvider
 import com.example.musicdiscovery.ui.screens.artists.ArtistsDestination
 import com.example.musicdiscovery.ui.screens.artists.ArtistsScreenBody
 import com.example.musicdiscovery.ui.screens.artists.ArtistsViewModel
+import com.example.musicdiscovery.ui.screens.shared.LoadingButton
 
 object ArtistDetailsDestination : NavigationDestination {
     override val route = "Artist"
@@ -62,7 +63,7 @@ fun ArtistDetailsScreen(
                 navigateBack = navigateUp
             )
         },
-    ) {innerPadding ->
+    ) { innerPadding ->
         ArtistDetailsScreenBody(
             modifier = modifier.padding(innerPadding),
             artistDetailsViewModel = artistDetailsViewModel,
@@ -70,6 +71,7 @@ fun ArtistDetailsScreen(
         )
     }
 }
+
 @Composable
 fun ArtistDetailsScreenBody(
     artistDetailsViewModel: ArtistDetailsViewModel,
@@ -79,7 +81,8 @@ fun ArtistDetailsScreenBody(
     ArtistDetailsScreenSwitch(
         artistDetailsUiState = artistDetailsViewModel.artistDetailsUiState,
         retryAction = { artistDetailsViewModel.getArtistDetails(artistId) },
-        modifier
+        modifier = modifier,
+        fetchMoreTracks = artistDetailsViewModel::fetchMoreTracks
     )
 }
 
@@ -88,23 +91,43 @@ fun ArtistDetailsScreenBody(
 fun ArtistDetailsScreenSwitch(
     artistDetailsUiState: ArtistDetailsUiState,
     retryAction: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fetchMoreTracks: () -> Unit
 ) {
     when (artistDetailsUiState) {
         is ArtistDetailsUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is ArtistDetailsUiState.Success -> ViewTracksScreen(artistDetailsUiState.artistDetails, modifier = modifier.fillMaxSize())
-        is ArtistDetailsUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize(), errorMessage = "Oops something went wrong while getting tracks...")
+        is ArtistDetailsUiState.Success -> ViewTracksScreen(
+            artistDetailsUiState.artistDetails,
+            modifier = modifier.fillMaxSize(),
+            fetchMoreTracks = fetchMoreTracks,
+            hasMore = artistDetailsUiState.hasMore,
+            isFetchingMore = artistDetailsUiState.isFetchingMore
+        )
+
+        is ArtistDetailsUiState.Error -> ErrorScreen(
+            retryAction,
+            modifier = modifier.fillMaxSize(),
+            errorMessage = "Oops something went wrong while getting tracks..."
+        )
     }
 }
 
 @Composable
 fun ViewTracksScreen(
     artistDetails: ArtistDetailsData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fetchMoreTracks: () -> Unit,
+    hasMore: Boolean,
+    isFetchingMore: Boolean
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.Center) {
         ArtistDetails(artist = artistDetails.artist)
-        Tracks(tracks = artistDetails.tracks)
+        Tracks(
+            tracks = artistDetails.tracks,
+            fetchMoreTracks = fetchMoreTracks,
+            hasMore = hasMore,
+            isFetchingMore = isFetchingMore
+        )
     }
 }
 
@@ -129,7 +152,10 @@ fun ArtistDetails(artist: Artist, modifier: Modifier = Modifier) {
 @Composable
 fun Tracks(
     tracks: List<Track>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fetchMoreTracks: () -> Unit,
+    hasMore: Boolean,
+    isFetchingMore: Boolean
 ) {
     LazyColumn(modifier = modifier) {
         items(tracks) { track ->
@@ -143,6 +169,15 @@ fun Tracks(
                     style = MaterialTheme.typography.headlineSmall
                 )
             }
+        }
+        item {
+            if (hasMore)
+                LoadingButton(
+                    text = "Fetch more...",
+                    loadingText = "Fetching more...",
+                    onClick = fetchMoreTracks,
+                    loading = isFetchingMore
+                )
         }
     }
 }

@@ -18,24 +18,34 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-data class ArtistDetailsData (val artist: Artist, val tracks: List<Track>)
+data class ArtistDetailsData(val artist: Artist, val tracks: List<Track>)
 
 sealed interface ArtistDetailsUiState {
-    data class Success(val artistDetails: ArtistDetailsData) : ArtistDetailsUiState
+    data class Success(
+        val artistDetails: ArtistDetailsData,
+        val isFetchingMore: Boolean,
+        val hasMore: Boolean
+    ) : ArtistDetailsUiState
+
     object Error : ArtistDetailsUiState
     object Loading : ArtistDetailsUiState
 }
 
 class ArtistDetailsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val deezerArtistRepository : DeezerArtistRepository
+    private val deezerArtistRepository: DeezerArtistRepository
 ) : ViewModel() {
     var artistDetailsUiState: ArtistDetailsUiState by mutableStateOf(ArtistDetailsUiState.Loading)
         private set
-    private val artistId: Long = checkNotNull(savedStateHandle[ArtistDetailsDestination.artistIdArg])
+    private val artistId: Long =
+        checkNotNull(savedStateHandle[ArtistDetailsDestination.artistIdArg])
+
+    val limit = 10
+    var index = 0
 
     init {
         getArtistDetails(artistId)
+        index += limit
     }
 
     fun getArtistDetails(artistId: Long) {
@@ -43,8 +53,42 @@ class ArtistDetailsViewModel(
             artistDetailsUiState = ArtistDetailsUiState.Loading
             artistDetailsUiState = try {
                 val artist = deezerArtistRepository.getArtistDetails(artistId)
-                val tracks = deezerArtistRepository.getArtistTracks(artistId)
-                ArtistDetailsUiState.Success(ArtistDetailsData(artist, tracks.data))
+                val tracks = deezerArtistRepository.getArtistTracks(artistId, limit, index)
+                ArtistDetailsUiState.Success(
+                    ArtistDetailsData(artist, tracks.data),
+                    false,
+                    tracks.total > tracks.data.count()
+                )
+            } catch (e: IOException) {
+                e.printStackTrace()
+                ArtistDetailsUiState.Error
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                ArtistDetailsUiState.Error
+            }
+        }
+    }
+
+    fun fetchMoreTracks() {
+        if (artistDetailsUiState !is ArtistDetailsUiState.Success)
+            return
+
+        viewModelScope.launch {
+            artistDetailsUiState = ArtistDetailsUiState.Success(
+                (artistDetailsUiState as ArtistDetailsUiState.Success).artistDetails,
+                true,
+                (artistDetailsUiState as ArtistDetailsUiState.Success).hasMore
+            )
+            artistDetailsUiState = try {
+                val newTracks = deezerArtistRepository.getArtistTracks(artistId, limit, index)
+                val tracks =
+                    (artistDetailsUiState as ArtistDetailsUiState.Success).artistDetails.tracks + newTracks.data
+                ArtistDetailsUiState.Success(
+                    ArtistDetailsData(
+                        (artistDetailsUiState as ArtistDetailsUiState.Success).artistDetails.artist,
+                        tracks
+                    ), false, newTracks.total > tracks.count()
+                )
             } catch (e: IOException) {
                 e.printStackTrace()
                 ArtistDetailsUiState.Error
