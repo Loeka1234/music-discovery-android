@@ -15,6 +15,7 @@ import com.example.musicdiscovery.data.Event
 import com.example.musicdiscovery.data.FavoriteArtistsRepository
 import com.example.musicdiscovery.entity.FavoriteArtistEntity
 import com.example.musicdiscovery.model.Artist
+import com.example.musicdiscovery.model.DeezerResponseList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -26,31 +27,79 @@ data class ArtistsUiData(
 )
 
 sealed interface ArtistsUiState {
-    data class Success(val artistsUiData: ArtistsUiData) : ArtistsUiState
+    data class Success(
+        val artistsUiData: ArtistsUiData,
+        val isFetchingMore: Boolean,
+        val hasMore: Boolean
+    ) : ArtistsUiState
+
     object Error : ArtistsUiState
     object Loading : ArtistsUiState
 }
 
 class ArtistsViewModel(
     savedStateHandle: SavedStateHandle,
-    private val deezerArtistRepository : DeezerArtistRepository,
+    private val deezerArtistRepository: DeezerArtistRepository,
     private val favoriteArtistsRepository: FavoriteArtistsRepository
 ) : ViewModel() {
     var artistsUiState: ArtistsUiState by mutableStateOf(ArtistsUiState.Loading)
         private set
 
-    private val artistName: String = checkNotNull(savedStateHandle[ArtistsDestination.artistNameArg])
+    private val artistName: String =
+        checkNotNull(savedStateHandle[ArtistsDestination.artistNameArg])
+
+    private val limit = 10;
+    private var index = 0;
+
     init {
         getArtists(artistName)
+        index += limit;
     }
 
     fun getArtists(artistName: String) {
         viewModelScope.launch {
             artistsUiState = ArtistsUiState.Loading
             artistsUiState = try {
-                val artists = deezerArtistRepository.searchArtist(artistName)
+                val artists = deezerArtistRepository.searchArtist(artistName, limit, index)
                 val favoriteArtists = favoriteArtistsRepository.getAllFavoriteArtistsStream()
-                ArtistsUiState.Success(ArtistsUiData(artists.data, favoriteArtists.first()))
+                ArtistsUiState.Success(
+                    ArtistsUiData(artists.data, favoriteArtists.first()),
+                    false,
+                    artists.total > artists.data.count()
+                )
+            } catch (e: IOException) {
+                e.printStackTrace()
+                ArtistsUiState.Error
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                ArtistsUiState.Error
+            }
+        }
+    }
+
+
+    fun fetchMoreArtists() {
+        if (artistsUiState !is ArtistsUiState.Success) return
+
+        viewModelScope.launch {
+            artistsUiState = ArtistsUiState.Success(
+                (artistsUiState as ArtistsUiState.Success).artistsUiData,
+                true,
+                (artistsUiState as ArtistsUiState.Success).hasMore
+            )
+            artistsUiState = try {
+                val newArtists = deezerArtistRepository.searchArtist(artistName, limit, index)
+                val artists =
+                    (artistsUiState as ArtistsUiState.Success).artistsUiData.artists + newArtists.data
+                index += limit
+                ArtistsUiState.Success(
+                    ArtistsUiData(
+                        artists,
+                        (artistsUiState as ArtistsUiState.Success).artistsUiData.favoriteArtists
+                    ),
+                    false,
+                    newArtists.total > artists.count()
+                )
             } catch (e: IOException) {
                 e.printStackTrace()
                 ArtistsUiState.Error
@@ -82,7 +131,9 @@ class ArtistsViewModel(
                 ArtistsUiData(
                     (artistsUiState as ArtistsUiState.Success).artistsUiData.artists,
                     cloned
-                )
+                ),
+                false,
+                (artistsUiState as ArtistsUiState.Success).hasMore
             )
         }
     }

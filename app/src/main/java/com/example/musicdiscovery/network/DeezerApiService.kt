@@ -10,7 +10,7 @@ import retrofit2.http.Query
 
 interface DeezerApiService {
     @GET("search/artist")
-    suspend fun getArtists(@Query("q") artistName: String): DeezerResponseList<Artist>
+    suspend fun getArtists(@Query("q") artistName: String, @Query("limit") limit: Int, @Query("index") index: Int): DeezerResponseList<Artist>
     @GET("artist/{artistId}/top")
     suspend fun getArtistTracks(@Path("artistId") artistId: Long, @Query("limit") limit: Int, @Query("index") index: Int): DeezerResponseList<Track>
     @GET("track/{trackId}")

@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeezerResponseList<T> (
-    val data: List<T>
+    val data: List<T>,
+    val total: Int,
 )

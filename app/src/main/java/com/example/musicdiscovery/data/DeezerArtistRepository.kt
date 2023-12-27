@@ -6,7 +6,7 @@ import com.example.musicdiscovery.model.Track
 import com.example.musicdiscovery.network.DeezerApiService
 
 interface DeezerArtistRepository {
-    suspend fun searchArtist(name: String): DeezerResponseList<Artist>
+    suspend fun searchArtist(name: String, limit: Int, index: Int): DeezerResponseList<Artist>
     suspend fun getArtistTracks(artistId: Long): DeezerResponseList<Track>
     suspend fun getArtistDetails(artistId: Long): Artist
 }
@@ -14,7 +14,7 @@ interface DeezerArtistRepository {
 class NetworkDeezerArtistRepository(
     private val deezerApiService: DeezerApiService
 ): DeezerArtistRepository {
-    override suspend fun searchArtist(name: String): DeezerResponseList<Artist> = deezerApiService.getArtists(name);
+    override suspend fun searchArtist(name: String, limit: Int, index: Int): DeezerResponseList<Artist> = deezerApiService.getArtists(name, limit, index)
     override suspend fun getArtistTracks(artistId: Long): DeezerResponseList<Track> {
         val tracks = deezerApiService.getArtistTracks(artistId, 10, 0) // TODO
         tracks.data.forEach { track ->

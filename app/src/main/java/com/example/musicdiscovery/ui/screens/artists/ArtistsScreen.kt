@@ -20,6 +20,7 @@ import com.example.musicdiscovery.navigation.NavigationDestination
 import com.example.musicdiscovery.ui.AppViewModelProvider
 import com.example.musicdiscovery.ui.screens.shared.ArtistCard
 import com.example.musicdiscovery.ui.screens.shared.ErrorScreen
+import com.example.musicdiscovery.ui.screens.shared.LoadingButton
 import com.example.musicdiscovery.ui.screens.shared.LoadingScreen
 
 object ArtistsDestination : NavigationDestination {
@@ -74,7 +75,8 @@ fun ArtistsScreenBody(
         retryAction = { artistsViewModel.getArtists(artistName) },
         modifier,
         onArtistClick = navigateToArtistDetails,
-        favoriteArtist = { artistsViewModel.favoriteOrUnfavoriteArtist(it) }
+        favoriteArtist = { artistsViewModel.favoriteOrUnfavoriteArtist(it) },
+        fetchMoreArtists = artistsViewModel::fetchMoreArtists
     )
 }
 
@@ -84,12 +86,26 @@ fun ArtistsScreenSwitch(
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
     onArtistClick: (artistId: Long) -> Unit,
-    favoriteArtist: (artist: Artist) -> Unit
+    favoriteArtist: (artist: Artist) -> Unit,
+    fetchMoreArtists: () -> Unit,
 ) {
     when (artistsUiState) {
         is ArtistsUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is ArtistsUiState.Success -> ViewArtistsScreen(artistsUiState.artistsUiData, modifier = modifier.fillMaxSize(), favoriteArtist = favoriteArtist, onArtistClick = onArtistClick)
-        is ArtistsUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize(), errorMessage = "Oops something went wrong while getting artist...")
+        is ArtistsUiState.Success -> ViewArtistsScreen(
+            artistsUiState.artistsUiData,
+            modifier = modifier.fillMaxSize(),
+            favoriteArtist = favoriteArtist,
+            onArtistClick = onArtistClick,
+            fetchMoreArtists = fetchMoreArtists,
+            isFetchingMore = artistsUiState.isFetchingMore,
+            hasMore = artistsUiState.hasMore
+        )
+
+        is ArtistsUiState.Error -> ErrorScreen(
+            retryAction,
+            modifier = modifier.fillMaxSize(),
+            errorMessage = "Oops something went wrong while getting artist..."
+        )
     }
 }
 
@@ -98,7 +114,10 @@ fun ViewArtistsScreen(
     artistsUiData: ArtistsUiData,
     modifier: Modifier = Modifier,
     onArtistClick: (artistId: Long) -> Unit,
-    favoriteArtist: (artist: Artist) -> Unit
+    favoriteArtist: (artist: Artist) -> Unit,
+    fetchMoreArtists: () -> Unit,
+    isFetchingMore: Boolean,
+    hasMore: Boolean
 ) {
     LazyColumn(modifier = modifier) {
         items(artistsUiData.artists) { artist ->
@@ -108,10 +127,19 @@ fun ViewArtistsScreen(
                 artistName = artist.name,
                 artistFans = artist.nbFan,
                 isFavorite = artistsUiData.favoriteArtists.any { it.id == artist.id },
-                favoriteArtist = { favoriteArtist(artist)  },
+                favoriteArtist = { favoriteArtist(artist) },
                 onArtistClick = onArtistClick,
                 modifier = Modifier.padding(8.dp),
             )
+        }
+        item {
+            if (hasMore)
+                LoadingButton(
+                    text = "Fetch more...",
+                    loadingText = "Fetching more...",
+                    onClick = fetchMoreArtists,
+                    loading = isFetchingMore
+                )
         }
     }
 }
