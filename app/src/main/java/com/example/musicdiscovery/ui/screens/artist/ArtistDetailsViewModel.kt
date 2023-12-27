@@ -57,7 +57,7 @@ class ArtistDetailsViewModel(
                 ArtistDetailsUiState.Success(
                     ArtistDetailsData(artist, tracks.data),
                     false,
-                    tracks.total > tracks.data.count()
+                    if (tracks.data.isEmpty()) false else tracks.total > tracks.data.count()
                 )
             } catch (e: IOException) {
                 e.printStackTrace()
