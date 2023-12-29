@@ -47,11 +47,12 @@ class MusicDiscoveryNavigationTest {
     }
 
     private fun navigateToArtistsScreenFromStartScreen() {
-        val testTagSearchArtists =  composeTestRule.activity.getString(R.string.test_tag_search_artists)
+        val testTagSearchArtists =
+            composeTestRule.activity.getString(R.string.test_tag_search_artists)
         val searchArtistsInput = composeTestRule.onNodeWithTag(testTagSearchArtists)
         searchArtistsInput.performTextInput("artist")
 
-        val searchArtistButtonText =  composeTestRule.activity.getString(R.string.search_text)
+        val searchArtistButtonText = composeTestRule.activity.getString(R.string.search_text)
         val searchArtistsButton = composeTestRule.onNodeWithText(searchArtistButtonText)
         searchArtistsButton.performClick()
     }
@@ -68,6 +69,9 @@ class MusicDiscoveryNavigationTest {
         navigateToArtistsScreenFromStartScreen()
 
         val testTagArtistCard = composeTestRule.activity.getString(R.string.test_tag_artist)
+        composeTestRule.waitUntil {
+            composeTestRule.onAllNodesWithTag(testTagArtistCard).fetchSemanticsNodes().size > 1
+        }
         composeTestRule.onAllNodesWithTag(testTagArtistCard)
             .onFirst()
             .performClick()
