@@ -32,10 +32,16 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         retrofit.create(DeezerApiService::class.java)
     }
 
+    /**
+     * Deezer API Repository
+     */
     override val deezerArtistRepository: DeezerArtistRepository by lazy {
         NetworkDeezerArtistRepository(retroFitService)
     }
 
+    /**
+     * Room Repository
+     */
     override val favoriteArtistsRepository: FavoriteArtistsRepository by lazy {
         OfflineFavoriteArtistsRepository(MusicDiscoveryDatabase.getDatabase(context).favoriteArtistDao())
     }

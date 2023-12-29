@@ -51,6 +51,9 @@ class ArtistsViewModel(
         index += limit
     }
 
+    /**
+     * Gets list of artist
+     */
     fun getArtists(artistName: String) {
         viewModelScope.launch {
             artistsUiState = ArtistsUiState.Loading
@@ -72,7 +75,9 @@ class ArtistsViewModel(
         }
     }
 
-
+    /**
+     * Fetches more artists
+     */
     fun fetchMoreArtists() {
         if (artistsUiState !is ArtistsUiState.Success) return
 
@@ -105,6 +110,9 @@ class ArtistsViewModel(
         }
     }
 
+    /**
+     * Favorite or unfavorite an artist based on if it's already favorited
+     */
     fun favoriteOrUnfavoriteArtist(artist: Artist) {
         if (artistsUiState !is ArtistsUiState.Success) return
 

@@ -43,6 +43,9 @@ class ArtistDetailsViewModel(
         index += limit
     }
 
+    /**
+     * Get the details of an artist, including tracks
+     */
     fun getArtistDetails(artistId: Long) {
         viewModelScope.launch {
             artistDetailsUiState = ArtistDetailsUiState.Loading
@@ -64,6 +67,9 @@ class ArtistDetailsViewModel(
         }
     }
 
+    /**
+     * Fetch more tracks of the artist
+     */
     fun fetchMoreTracks() {
         if (artistDetailsUiState !is ArtistDetailsUiState.Success)
             return

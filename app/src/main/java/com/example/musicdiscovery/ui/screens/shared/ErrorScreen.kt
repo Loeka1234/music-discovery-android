@@ -13,5 +13,4 @@ fun ErrorScreen(
     Button(onClick = retryAction) {
         Text(text = "Try again")
     }
-//    TODO: Styling etc
 }

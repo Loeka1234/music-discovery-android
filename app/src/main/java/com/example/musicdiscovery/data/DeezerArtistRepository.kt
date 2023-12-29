@@ -6,8 +6,19 @@ import com.example.musicdiscovery.model.Track
 import com.example.musicdiscovery.network.DeezerApiService
 
 interface DeezerArtistRepository {
+    /**
+     * Search artists by string
+     */
     suspend fun searchArtist(name: String, limit: Int, index: Int): DeezerResponseList<Artist>
+
+    /**
+     * Get the tracks of an artist with given id
+     */
     suspend fun getArtistTracks(artistId: Long, limit: Int, index: Int): DeezerResponseList<Track>
+
+    /**
+     * Get the details of an artist with given id
+     */
     suspend fun getArtistDetails(artistId: Long): Artist
 }
 
