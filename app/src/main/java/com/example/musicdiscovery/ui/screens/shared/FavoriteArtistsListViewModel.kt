@@ -1,4 +1,4 @@
-package com.example.musicdiscovery.ui.screens.shared.favoriteArtistsList
+package com.example.musicdiscovery.ui.screens.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.musicdiscovery.MusicDiscoveryApplication
 import com.example.musicdiscovery.ui.screens.artist.ArtistDetailsViewModel
 import com.example.musicdiscovery.ui.screens.artists.ArtistsViewModel
-import com.example.musicdiscovery.ui.screens.shared.favoriteArtistsList.FavoriteArtistsListViewModel
+import com.example.musicdiscovery.ui.screens.shared.FavoriteArtistsListViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Inventory app

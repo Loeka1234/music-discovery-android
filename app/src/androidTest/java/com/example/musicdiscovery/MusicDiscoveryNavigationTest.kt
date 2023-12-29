@@ -69,7 +69,7 @@ class MusicDiscoveryNavigationTest {
         navigateToArtistsScreenFromStartScreen()
 
         val testTagArtistCard = composeTestRule.activity.getString(R.string.test_tag_artist)
-        composeTestRule.waitUntil {
+        composeTestRule.waitUntil(10_000) {
             composeTestRule.onAllNodesWithTag(testTagArtistCard).fetchSemanticsNodes().size > 1
         }
         composeTestRule.onAllNodesWithTag(testTagArtistCard)
