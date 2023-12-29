@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.musicdiscovery.MusicDiscoveryAppBar
@@ -67,7 +68,7 @@ fun StartScreenBody(
     onArtistClick: (artistId: Long) -> Unit
 ) {
 
-    Column (modifier = modifier) {
+    Column(modifier = modifier) {
         SearchArtistBox(onNavigateToArtists = onNavigateToArtists)
         FavoriteArtistsListWrapper(onArtistClick = onArtistClick)
     }
@@ -90,13 +91,15 @@ fun SearchArtistBox(
             value = artistName,
             onValueChange = { artistName = it },
             label = { Text("Artist") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(stringResource(id = R.string.test_tag_search_artists))
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button( onClick = {
+            Button(onClick = {
                 onNavigateToArtists(artistName)
             }) {
-                Text(text = "Search")
+                Text(text = stringResource(id = R.string.search_text))
             }
         }
     }

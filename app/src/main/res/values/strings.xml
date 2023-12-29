@@ -11,4 +11,9 @@
     <string name="artist_details_route">Artist?artistId={artistId}</string>
 
     <string name="back_button">Back</string>
+
+    <string name="search_text">Search</string>
+
+    <string name="test_tag_search_artists">test_tag_search_artists</string>
+    <string name="test_tag_artist">test_tag_artist</string>
 </resources>
