@@ -28,7 +28,7 @@ class ArtistsViewModelTest {
     @Before
     fun setUp() {
         artistsViewModel = ArtistsViewModel(
-            SavedStateHandle(mapOf(Pair("artistName", "Teksa"))),
+            SavedStateHandle(mapOf(Pair("artistName", "artist"))),
             FakeDeezerArtistRepository(artistsCount),
             FakeFavoriteArtistsRepository()
         )
@@ -39,7 +39,7 @@ class ArtistsViewModelTest {
     var mainCoroutineRule = MainCoroutineRule(UnconfinedTestDispatcher())
 
     @Test
-    fun ArtistsViewModel_Initialization_ArtistsAndFavoriteArtistsLoaded() {
+    fun artistsViewModel_Initialization_ArtistsAndFavoriteArtistsLoaded() {
         assertTrue(artistsViewModel.artistsUiState is ArtistsUiState.Success)
         assertEquals(
             0,
@@ -53,7 +53,7 @@ class ArtistsViewModelTest {
     }
 
     @Test
-    fun ArtistsViewModel_fetchMore_FetchesMoreArtists() {
+    fun artistsViewModel_fetchMore_FetchesMoreArtists() {
         artistsViewModel.fetchMoreArtists()
         assertTrue(artistsViewModel.artistsUiState is ArtistsUiState.Success)
         assertEquals(
@@ -68,8 +68,8 @@ class ArtistsViewModelTest {
     }
 
     @Test
-    fun ArtistsViewModel_favoriteOrUnfavoriteArtist_RemovesOrAddsArtistToFavorites() {
-        var artist = (artistsViewModel.artistsUiState as ArtistsUiState.Success).artistsUiData.artists[0]
+    fun artistsViewModel_favoriteOrUnfavoriteArtist_RemovesOrAddsArtistToFavorites() {
+        val artist = (artistsViewModel.artistsUiState as ArtistsUiState.Success).artistsUiData.artists[0]
 
         artistsViewModel.favoriteOrUnfavoriteArtist(artist)
 

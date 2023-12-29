@@ -26,7 +26,7 @@ fun MusicDiscoveryNavHost(
         composable(
             route = ArtistsDestination.routeWithArgs,
             arguments = listOf(navArgument(ArtistsDestination.artistNameArg) { type = NavType.StringType }),
-        ) {
+        ) { it ->
             val artistName = it.arguments?.getString(ArtistsDestination.artistNameArg)
 
             if (artistName == null)

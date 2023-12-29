@@ -1,6 +1,5 @@
 package com.example.musicdiscovery.ui.screens.artists
 
-import android.inputmethodservice.Keyboard.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -108,7 +107,6 @@ fun ArtistsScreenSwitch(
 
         is ArtistsUiState.Error -> ErrorScreen(
             retryAction,
-            modifier = modifier.fillMaxSize(),
             errorMessage = "Oops something went wrong while getting artist..."
         )
     }

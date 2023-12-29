@@ -5,15 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.musicdiscovery.MusicDiscoveryApplication
 import com.example.musicdiscovery.data.DeezerArtistRepository
 import com.example.musicdiscovery.model.Artist
 import com.example.musicdiscovery.model.Track
-import com.example.musicdiscovery.ui.screens.artists.ArtistsDestination
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -27,8 +22,8 @@ sealed interface ArtistDetailsUiState {
         val hasMore: Boolean
     ) : ArtistDetailsUiState
 
-    object Error : ArtistDetailsUiState
-    object Loading : ArtistDetailsUiState
+    data object Error : ArtistDetailsUiState
+    data object Loading : ArtistDetailsUiState
 }
 
 class ArtistDetailsViewModel(
@@ -40,8 +35,8 @@ class ArtistDetailsViewModel(
     private val artistId: Long =
         checkNotNull(savedStateHandle[ArtistDetailsDestination.artistIdArg])
 
-    val limit = 10
-    var index = 0
+    private val limit = 10
+    private var index = 0
 
     init {
         getArtistDetails(artistId)

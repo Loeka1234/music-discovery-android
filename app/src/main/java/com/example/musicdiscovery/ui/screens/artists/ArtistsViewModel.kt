@@ -5,17 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.musicdiscovery.MusicDiscoveryApplication
 import com.example.musicdiscovery.data.DeezerArtistRepository
 import com.example.musicdiscovery.data.Event
 import com.example.musicdiscovery.data.FavoriteArtistsRepository
 import com.example.musicdiscovery.entity.FavoriteArtistEntity
 import com.example.musicdiscovery.model.Artist
-import com.example.musicdiscovery.model.DeezerResponseList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -33,8 +28,8 @@ sealed interface ArtistsUiState {
         val hasMore: Boolean
     ) : ArtistsUiState
 
-    object Error : ArtistsUiState
-    object Loading : ArtistsUiState
+    data object Error : ArtistsUiState
+    data object Loading : ArtistsUiState
 }
 
 class ArtistsViewModel(
@@ -48,12 +43,12 @@ class ArtistsViewModel(
     private val artistName: String =
         checkNotNull(savedStateHandle[ArtistsDestination.artistNameArg])
 
-    private val limit = 10;
-    private var index = 0;
+    private val limit = 10
+    private var index = 0
 
     init {
         getArtists(artistName)
-        index += limit;
+        index += limit
     }
 
     fun getArtists(artistName: String) {
@@ -114,7 +109,7 @@ class ArtistsViewModel(
         if (artistsUiState !is ArtistsUiState.Success) return
 
         viewModelScope.launch {
-            var result = favoriteArtistsRepository.insertOrDeleteFavoriteArtistIfExists(
+            val result = favoriteArtistsRepository.insertOrDeleteFavoriteArtistIfExists(
                 FavoriteArtistEntity(artist.id, artist.name, artist.picture)
             )
 

@@ -16,13 +16,13 @@ class OfflineFavoriteArtistsRepository(private val favoriteArtistDao: FavoriteAr
 
     override suspend fun updateFavoriteArtist(favoriteArtist: FavoriteArtistEntity) = favoriteArtistDao.update(favoriteArtist)
     override suspend fun insertOrDeleteFavoriteArtistIfExists(favoriteArtistEntity: FavoriteArtistEntity): Event {
-        var favoriteArtist = getFavoriteArtistStream(favoriteArtistEntity.id).firstOrNull()
-        if (favoriteArtist == null) {
+        val favoriteArtist = getFavoriteArtistStream(favoriteArtistEntity.id).firstOrNull()
+        return if (favoriteArtist == null) {
             insertFavoriteArtist(favoriteArtistEntity)
-            return Event.INSERTED
+            Event.INSERTED
         } else {
             deleteFavoriteArtist(favoriteArtistEntity)
-            return Event.DELETED
+            Event.DELETED
         }
     }
 }

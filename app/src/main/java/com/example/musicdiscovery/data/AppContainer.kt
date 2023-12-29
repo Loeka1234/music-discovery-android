@@ -1,18 +1,13 @@
 package com.example.musicdiscovery.data
 
 import android.content.Context
-import android.util.Log
 import com.example.musicdiscovery.network.DeezerApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import java.io.IOException
 
 interface AppContainer {
     val deezerArtistRepository: DeezerArtistRepository

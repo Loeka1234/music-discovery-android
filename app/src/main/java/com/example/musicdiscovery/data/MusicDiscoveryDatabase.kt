@@ -1,12 +1,11 @@
 package com.example.musicdiscovery.data
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.musicdiscovery.dao.FavoriteArtistDao
 import com.example.musicdiscovery.entity.FavoriteArtistEntity
-import com.example.musicdiscovery.model.Artist
-import android.content.Context
-import androidx.room.Room
 
 @Database(entities = [FavoriteArtistEntity::class], version = 1, exportSchema = false)
 abstract class MusicDiscoveryDatabase: RoomDatabase() {

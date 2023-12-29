@@ -1,4 +1,4 @@
-package com.example.musicdiscovery.ui.screens.shared.FavoriteArtistsList
+package com.example.musicdiscovery.ui.screens.shared.favoriteArtistsList
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn

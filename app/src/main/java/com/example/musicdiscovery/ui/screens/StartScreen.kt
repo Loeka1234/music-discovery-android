@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.musicdiscovery.MusicDiscoveryAppBar
 import com.example.musicdiscovery.R
 import com.example.musicdiscovery.navigation.NavigationDestination
-import com.example.musicdiscovery.ui.screens.shared.FavoriteArtistsList.FavoriteArtistsList
+import com.example.musicdiscovery.ui.screens.shared.favoriteArtistsList.FavoriteArtistsList
 
 object StartScreenDestination : NavigationDestination {
     override val route = "Start"

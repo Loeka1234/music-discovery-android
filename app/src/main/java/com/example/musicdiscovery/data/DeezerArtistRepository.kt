@@ -22,7 +22,7 @@ class NetworkDeezerArtistRepository(
             track.trackDetails = trackDetails
         }
 
-        return tracks;
+        return tracks
     }
     override suspend fun getArtistDetails(artistId: Long): Artist = deezerApiService.getArtistDetails(artistId)
 }

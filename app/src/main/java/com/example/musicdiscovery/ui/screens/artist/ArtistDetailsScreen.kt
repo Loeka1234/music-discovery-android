@@ -32,9 +32,6 @@ import com.example.musicdiscovery.R
 import com.example.musicdiscovery.model.Artist
 import com.example.musicdiscovery.navigation.NavigationDestination
 import com.example.musicdiscovery.ui.AppViewModelProvider
-import com.example.musicdiscovery.ui.screens.artists.ArtistsDestination
-import com.example.musicdiscovery.ui.screens.artists.ArtistsScreenBody
-import com.example.musicdiscovery.ui.screens.artists.ArtistsViewModel
 import com.example.musicdiscovery.ui.screens.shared.LoadingButton
 
 object ArtistDetailsDestination : NavigationDestination {
@@ -104,7 +101,6 @@ fun ArtistDetailsScreenSwitch(
 
         is ArtistDetailsUiState.Error -> ErrorScreen(
             retryAction,
-            modifier = modifier.fillMaxSize(),
             errorMessage = "Oops something went wrong while getting tracks..."
         )
     }
